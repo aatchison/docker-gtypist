@@ -34,6 +34,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Detect latest gtypist version
+      - name: Get latest gtypist version
+        id: gtypist_version
+        run: |
+          GTYPIST_VERSION=$(curl -s https://ftp.gnu.org/gnu/gtypist/ | \
+            grep -oP 'gtypist-\K[0-9.]+(?=\.tar\.xz)' | \
+            sort -V | tail -1)
+          echo "version=${GTYPIST_VERSION}" >> $GITHUB_OUTPUT
+          echo "Detected gtypist version: ${GTYPIST_VERSION}"
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -51,9 +61,25 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # Check if version tag already exists
+      - name: Check if version already built
+        id: check_version
+        if: github.event_name == 'schedule'
+        run: |
+          VERSION=${{ steps.gtypist_version.outputs.version }}
+          # Check if the version tag exists in the registry
+          if docker manifest inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:gtypist-${VERSION} > /dev/null 2>&1; then
+            echo "Version ${VERSION} already exists, skipping build"
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "Version ${VERSION} is new, proceeding with build"
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
       # Extract metadata (tags, labels) for Docker
       # https://github.com/docker/metadata-action
       - name: Extract Docker metadata
+        if: steps.check_version.outputs.skip != 'true'
         id: meta
         uses: docker/metadata-action@v5
         with:
@@ -66,10 +92,13 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
             type=sha
+            type=raw,value=gtypist-${{ steps.gtypist_version.outputs.version }}
+            type=raw,value=latest,enable={{is_default_branch}}
 
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
       - name: Build and push Docker image
+        if: steps.check_version.outputs.skip != 'true'
         uses: docker/build-push-action@v6
         with:
           platforms: linux/amd64,linux/arm/v7,linux/arm64

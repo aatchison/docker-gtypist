@@ -10,7 +10,20 @@ GNU Typist built and run in a container
 
 ## Usage
 
-### Run with the latest version (default)
+### Run with the latest version
+
+```bash
+docker run -it ghcr.io/aatchison/docker-gtypist:latest
+```
+
+### Run a specific gtypist version
+
+```bash
+# Run gtypist version 2.10.1
+docker run -it ghcr.io/aatchison/docker-gtypist:gtypist-2.10.1
+```
+
+### Run the latest main branch build
 
 ```bash
 docker run -it ghcr.io/aatchison/docker-gtypist:main
@@ -32,9 +45,19 @@ docker build --build-arg GTYPIST_VERSION=2.10.1 -t gtypist .
   - Set to `latest` to automatically fetch and build the newest version
   - Set to a specific version number (e.g., `2.10.1`) to pin to that version
 
+## Image Tags
+
+The following tags are available:
+
+- `latest` - Latest build from main branch with the newest gtypist version
+- `main` - Latest build from main branch
+- `gtypist-X.Y.Z` - Specific gtypist version (e.g., `gtypist-2.10.1`)
+- `sha-XXXXXXX` - Specific commit SHA
+
 ## Automated Builds
 
 This repository uses GitHub Actions to:
-- Build and publish images nightly with the latest gtypist version
-- Build on every push to main branch
-- Test builds on pull requests
+- **Nightly builds**: Check for new gtypist versions and build only if updated
+- **Push to main**: Build and publish with version-specific tags
+- **Pull requests**: Test builds without publishing
+- **Skip redundant builds**: If gtypist version hasn't changed, scheduled builds are skipped
