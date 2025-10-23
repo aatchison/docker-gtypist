@@ -61,3 +61,4 @@ This repository uses GitHub Actions to:
 - **Push to main**: Build and publish with version-specific tags
 - **Pull requests**: Test builds without publishing
 - **Skip redundant builds**: If gtypist version hasn't changed, scheduled builds are skipped
+- **Efficient builds**: Pre-detected version is passed as build argument to avoid duplicate fetches
