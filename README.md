@@ -20,7 +20,7 @@ docker run -it ghcr.io/aatchison/docker-gtypist:latest
 
 ```bash
 # Run gtypist version 2.10.1
-docker run -it ghcr.io/aatchison/docker-gtypist:gtypist-2.10.1
+docker run -it ghcr.io/aatchison/docker-gtypist:2.10.1
 ```
 
 ### Run the latest main branch build
@@ -51,7 +51,7 @@ The following tags are available:
 
 - `latest` - Latest build from main branch with the newest gtypist version
 - `main` - Latest build from main branch
-- `gtypist-X.Y.Z` - Specific gtypist version (e.g., `gtypist-2.10.1`)
+- `X.Y.Z` - Specific gtypist version (e.g., `2.10.1`)
 - `sha-XXXXXXX` - Specific commit SHA
 
 ## Automated Builds

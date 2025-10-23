@@ -68,7 +68,7 @@ jobs:
         run: |
           VERSION=${{ steps.gtypist_version.outputs.version }}
           # Check if the version tag exists in the registry
-          if docker manifest inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:gtypist-${VERSION} > /dev/null 2>&1; then
+          if docker manifest inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${VERSION} > /dev/null 2>&1; then
             echo "Version ${VERSION} already exists, skipping build"
             echo "skip=true" >> $GITHUB_OUTPUT
           else
@@ -92,7 +92,7 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
             type=sha
-            type=raw,value=gtypist-${{ steps.gtypist_version.outputs.version }}
+            type=raw,value=${{ steps.gtypist_version.outputs.version }}
             type=raw,value=latest,enable={{is_default_branch}}
 
       # Build and push Docker image with Buildx (don't push on PR)
